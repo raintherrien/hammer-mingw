@@ -1,0 +1,15 @@
+[submodule "external/hammer"]
+	path = external/hammer
+	url = https://github.com/raintherrien/hammer
+[submodule "external/SDL"]
+	path = external/SDL
+	url = https://github.com/libsdl-org/SDL.git
+[submodule "external/SDL_image"]
+	path = external/SDL_image
+	url = https://github.com/libsdl-org/SDL_image.git
+[submodule "external/cglm"]
+	path = external/cglm
+	url = https://github.com/recp/cglm.git
+[submodule "external/glew"]
+	path = external/glew
+	url = https://github.com/nigels-com/glew.git
