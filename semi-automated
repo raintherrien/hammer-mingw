@@ -1,0 +1,53 @@
+#!/bin/bash
+
+workspace=$(cd $(dirname "${BASH_SOURCE[0]}") &> /dev/null && pwd)
+
+# TODO It would be really easy to create a local DESTDIR for our
+# crosscompiled libraries rather than relying on our distribution
+# creating /usr/x86_64-w64-mingw32 with our toolchain
+
+# Compile and install the typical CMake projects
+for projectdir in "hammer/external/deadlock" \
+                  "hammer/external/delaunator-c" \
+                  "cglm" \
+                  "SDL" \
+                  "SDL_image/external/zlib-1.2.11" \
+                  "SDL_image/external/libpng-1.6.37"; do
+	cd $workspace/external/$projectdir
+	mkdir -p build && cd build
+	cmake -DCMAKE_TOOLCHAIN_FILE=$workspace/toolchain.cmake ..
+	sudo make DESTDIR=/usr/x86_64-w64-mingw32/ -j install
+done
+
+# Patch SDL2 Image to pull in libpng correctly
+patch $workspace/external/SDL_image/CMakeLists.txt $workspace/SDL_image-CMakeLists.patch
+
+# Build and install SDL2 Image manually
+cd $workspace/external/SDL_image
+mkdir -p build && cd build
+cmake -DCMAKE_TOOLCHAIN_FILE=$workspace/toolchain.cmake -DSUPPORT_JPG=0 ..
+make -j
+sudo cp libSDL2_image.dll /usr/x86_64-w64-mingw32/usr/local/bin/
+sudo cp libSDL2_image.dll.a /usr/x86_64-w64-mingw32/usr/local/lib/
+sudo cp ../SDL_image.h /usr/x86_64-w64-mingw32/usr/local/include/SDL2/
+
+# Compile and install GLEW
+cd $workspace/external/glew/auto
+make
+cd ../build
+cmake -DCMAKE_TOOLCHAIN_FILE=$workspace/toolchain.cmake ./cmake
+sudo make DESTDIR=/usr/x86_64-w64-mingw32/ -j install
+
+# And finally compile hammer!
+cd $workspace/external/hammer
+mkdir -p build && cd build
+cmake -DCMAKE_TOOLCHAIN_FILE=$workspace/toolchain.cmake ..
+make -j
+
+# Copy cross-compiled DLLs to hammer's directory
+for depfile in "/usr/x86_64-w64-mingw32/lib/libwinpthread-1.dll" \
+               "/usr/x86_64-w64-mingw32/usr/local/bin/libSDL2_image.dll" \
+               "/usr/x86_64-w64-mingw32/usr/local/bin/libpng16.dll" \
+               "/usr/x86_64-w64-mingw32/usr/local/bin/libzlib.dll"; do
+	cp $depfile $workspace/external/hammer/build
+done

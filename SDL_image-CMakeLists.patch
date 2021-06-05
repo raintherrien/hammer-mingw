@@ -1,0 +1,24 @@
+--- CMakeLists.txt	2021-06-05 13:37:25.390000000 -0400
++++ CMakeLists.txt	2021-06-05 13:38:00.900000000 -0400
+@@ -35,20 +35,7 @@
+ 	set(HAVE_LD_VERSION_SCRIPT OFF CACHE BOOL "" FORCE)
+ 	target_compile_definitions(SDL2_image PRIVATE -DLOAD_PNG)
+ 
+-  if (NOT TARGET zlib)
+-	add_subdirectory(external/zlib-1.2.11 "${CMAKE_CURRENT_BINARY_DIR}/external/zlib-1.2.11")
+-	set(ZLIB_INCLUDE_DIR "external/zlib-1.2.11")
+-	set(SKIP_INSTALL_ALL ON) # SDL_image doesn't support installing currently
+-	if (BUILD_SHARED_LIBS)
+-		set(ZLIB_LIBRARY zlib)
+-	else()
+-		set(ZLIB_LIBRARY zlibstatic)
+-	endif()
+-	target_include_directories(${ZLIB_LIBRARY} PUBLIC
+-		"${ZLIB_INCLUDE_DIR}"
+-		"${CMAKE_CURRENT_BINARY_DIR}/external/zlib-1.2.11" # zconf.h is generated there
+-	)
+-  endif()
++	find_package(PNG REQUIRED)
+ 
+ 	add_subdirectory(external/libpng-1.6.37)
+ 	include_directories(external/libpng-1.6.37)
