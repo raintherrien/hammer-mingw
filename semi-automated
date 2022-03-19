@@ -46,8 +46,10 @@ make -j
 
 # Copy cross-compiled DLLs to hammer's directory
 for depfile in "/usr/x86_64-w64-mingw32/lib/libwinpthread-1.dll" \
+               "/usr/x86_64-w64-mingw32/usr/local/bin/glew32.dll" \
                "/usr/x86_64-w64-mingw32/usr/local/bin/libSDL2_image.dll" \
                "/usr/x86_64-w64-mingw32/usr/local/bin/libpng16.dll" \
-               "/usr/x86_64-w64-mingw32/usr/local/bin/libzlib.dll"; do
+               "/usr/x86_64-w64-mingw32/usr/local/bin/libzlib.dll" \
+               "/usr/x86_64-w64-mingw32/usr/local/bin/SDL2.dll"; do
 	cp $depfile $workspace/external/hammer/build
 done
